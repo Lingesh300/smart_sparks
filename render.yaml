@@ -1,0 +1,30 @@
+services:
+  # ── Math Galaxy Frontend Web Service ─────────────────────────────────────────
+  - type: web
+    name: math-galaxy-frontend
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    headers:
+      - path: /*
+        name: Content-Security-Policy
+        value: "frame-ancestors *;"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+
+  # ── Math Galaxy Secure AI Backend Proxy ──────────────────────────────────────
+  - type: web
+    name: math-galaxy-backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: node server/server.mjs
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: 4000
